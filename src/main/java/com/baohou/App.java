@@ -16,7 +16,7 @@ public class App
                 .setJdbcUrl("jdbc:mysql://127.0.0.1:3306/flowable?zeroDateTimeBehavior=convertToNull&useUnicode=true" +
                         "&characterEncoding=utf8&nullCatalogMeansCurrent=true")
                 .setJdbcUsername("root")
-                .setJdbcPassword("123456")
+                .setJdbcPassword("12345678")
                 .setJdbcDriver("com.mysql.cj.jdbc.Driver")
                 .setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
 
