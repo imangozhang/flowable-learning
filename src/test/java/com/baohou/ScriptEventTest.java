@@ -7,6 +7,7 @@ import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.Task;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 
 import java.util.HashMap;
 import java.util.List;
@@ -28,7 +29,7 @@ public class ScriptEventTest extends TestCase {
                 .setJdbcUrl("jdbc:mysql://127.0.0.1:3306/flowable?zeroDateTimeBehavior=convertToNull&useUnicode=true" +
                         "&characterEncoding=utf8&nullCatalogMeansCurrent=true")
                 .setJdbcUsername("root")
-                .setJdbcPassword("12345678")
+                .setJdbcPassword("123456")
                 .setJdbcDriver("com.mysql.cj.jdbc.Driver")
                 .setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
         processEngine = cfg.buildProcessEngine();
@@ -57,14 +58,9 @@ public class ScriptEventTest extends TestCase {
     public void testStart() {
         Scanner scanner= new Scanner(System.in);
 
-        System.out.println("Who are you?");
-        String employee = scanner.nextLine();
-
-        System.out.println("How many holidays do you want to request?");
-        Integer nrOfHolidays = Integer.valueOf(scanner.nextLine());
-
-        System.out.println("Why do you need them?");
-        String description = scanner.nextLine();
+        String employee = "zhangbh";
+        Integer nrOfHolidays = 3;
+        String description = "take care of parents";
 
         RuntimeService runtimeService = processEngine.getRuntimeService();
 
@@ -74,30 +70,14 @@ public class ScriptEventTest extends TestCase {
         variables.put("description", description);
         ProcessInstance processInstance =
                 runtimeService.startProcessInstanceByKey("holidayRequest", variables);
+
+        // 此时已经流转到脚本节点了
+        Boolean scriptVar = (Boolean) runtimeService.getVariable(processInstance.getProcessInstanceId(), "myScriptRsp");
+        System.out.println("The scriptTask default result is: " + scriptVar);
     }
 
-    public void testScriptTaskOut() {
-        // 查询任务列表
-        TaskService taskService = processEngine.getTaskService();
-        List<Task> tasks = taskService.createTaskQuery().taskCandidateGroup("managers").list();
-        System.out.println("You have " + tasks.size() + " tasks:");
-        for (int i=0; i < tasks.size(); i++) {
-            System.out.println((i+1) + ") " + tasks.get(i).getName());
-        }
 
-        // 确认 scriptTask 变量设置到任务上了吗？
-        System.out.println("Which task would you like to complete?");
-        Scanner scanner= new Scanner(System.in);
-        int taskIndex = Integer.parseInt(scanner.nextLine());
-        Task task = tasks.get(taskIndex - 1);
-        Map<String, Object> processVariables = taskService.getVariables(task.getId());
-        System.out.println("The scriptTask default result is: " + processVariables.get("myScriptRsp"));
-
-        // 确认 scriptTask 变量设置到流程实例上了吗？
-        // TODO
-    }
-
-    public void testComplete() {
+    public void p_testComplete() {
         // 查询任务列表
         TaskService taskService = processEngine.getTaskService();
         List<Task> tasks = taskService.createTaskQuery().taskCandidateGroup("managers").list();
